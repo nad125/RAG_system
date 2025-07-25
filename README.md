@@ -75,13 +75,7 @@ python main.py build-db
 ```
 This will create a folder named `faiss_index` in your directory.
 
-### Step 2: Run the API Server
-Once the knowledge base is built, you can start the API server.
-
-```bash
-python main.py run-api
-```
-The server will start on `http://localhost:8000`.
+step 2 Not possible in timeframe  api generation
 
 
 
