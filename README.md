@@ -6,7 +6,7 @@ This project implements a basic Retrieval-Augmented Generation (RAG) system capa
 - **Multilingual Support:** Handles queries in both English and Bengali.
 - **Advanced Text Extraction:** Uses an OCR-based pipeline with image pre-processing to extract text from scanned PDFs.
 - **Robust Retrieval:** Implements a "retrieve-then-rerank" strategy for improved accuracy.
-- **REST API:** Provides a simple `FastAPI` endpoint for easy interaction.
+
 - **Local First:** Uses FAISS for local vector storage, requiring no external database setup.
 
 ## Tech Stack
@@ -83,29 +83,7 @@ python main.py run-api
 ```
 The server will start on `http://localhost:8000`.
 
-## API Documentation
 
-### Chat Endpoint
-- **URL:** `/api/chat`
-- **Method:** `POST`
-- **Request Body:**
-  ```json
-  {
-    "query": "আপনার প্রশ্ন এখানে লিখুন"
-  }
-  ```
-- **Example with `curl`:**
-  ```bash
-  curl -X POST "http://localhost:8000/api/chat" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "বিয়ের সময় কল্যাণীর প্রকৃত বয়স কত ছিল?"}'
-  ```
-- **Success Response (200 OK):**
-  ```json
-  {
-    "answer": "প্রদত্ত তথ্য অনুযায়ী, বিয়ের সময় কল্যাণীর বয়স ছিল পনেরো বছর।"
-  }
-  ```
 
 ## Sample Queries and Outputs
 
