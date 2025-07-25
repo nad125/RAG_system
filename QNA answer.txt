@@ -1,0 +1,72 @@
+﻿Project Documentation: A Simple Multilingual RAG System
+This document provides a complete overview of the RAG (Retrieval-Augmented Generation) system built to answer questions from the "Aparichita" story in both Bengali and english from another text file.
+1. Source Code
+The complete, runnable source code for this project is contained within the Google Colab notebook provided in the Canvas (rag_colab_notebook_v2).
+For distribution, the code can be hosted on a public GitHub repository.
+GitHub Repository:https://github.com/nad125/RAG_system
+2. Setup Guide
+The system is designed to be run in a Google Colab environment.
+1. Install Dependencies: Run the first cell in the notebook to install all necessary system and Python libraries, including langchain, faiss-cpu, sentence-transformers, and rank_bm25.
+2. Set API Key: In the second cell, provide your Google AI (Gemini) API key when prompted. The key will be stored securely as a Colab secret.
+3. Upload Knowledge Base: Run the third cell and upload the clean aparichita.txt file. This file serves as the sole source of truth for the system.
+4. Build Vector Store: Execute the "Build Knowledge Base" cell. This will process the text file, create chunks, generate embeddings, and build the local FAISS and BM25 retrievers.
+5. Run Q&A: Run the final "Interactive Question & Answering" cell to start asking questions.
+3. Used Tools, Libraries, and Packages
+* Core Framework: langchain, langchain-community
+* LLM (Generator): langchain-google-genai (for Google's gemini-1.5-flash model)
+* Embedding Model: sentence-transformers/LaBSE via HuggingFaceEmbeddings
+* Vector Store (Semantic Search): faiss-cpu
+* Keyword Search: rank_bm25
+* Retrieval Strategy: EnsembleRetriever to combine semantic and keyword search.
+* Orchestration: Python 3, Google Colab
+4. Sample Queries and Outputs
+Bengali
+* Question: অনুপমের ভাষায় সুপুরুষ কাকে বলা হয়েছে?
+* Expected Answer: শম্ভুনাথবাবুকে
+* Question: কাকে অনুপমের ভাগ্য দেবতা বলে উল্লেখ করা হয়েছে?
+* Expected Answer: মামাকে
+* Question: বিয়ের সময় কল্যাণীর প্রকৃত বয়স কত ছিল?
+* Expected Answer: পনেরো
+English
+* Question: Who is the main guardian of Anupam?
+* Expected Answer: Anupam's main guardian is his maternal uncle (Mama).
+* Question: What is the name of Kalyani's father?
+* Expected Answer: Kalyani's father's name is Shambhunath Sen.
+5. Answers to Project Questions
+Q1: What method or library did you use to extract the text, and why? Did you face any formatting challenges with the PDF content?
+First, the project attempted to extract text from the PDF directly through a complex OCR pipeline made up of pytesseract, pdf2image, and OpenCV. This method was preferred because academic PDFs are often scanned images, making it useless to use normal text loaders.
+But this approach did not succeed. Severe content corruption was the primary concern. The OCR process was unable to extract the main story text and secondary material like practice questions, multiple-choice answers, and page numbers. This resulted in jumbled, meaningless pieces of text (like merging "মামা" and "শম্ভুনাথ" into one response).
+The final, successful solution was to bypass automated extraction and use a manually assembled, clean aparichita.txt file. This provided a 100% precise knowledge base, which was a prerequisite for the system to function appropriately.
+
+
+Q2: What chunking strategy did you choose? Why do you think it works well for semantic retrieval?
+The method employed is the RecursiveCharacterTextSplitter from LangChain, with a chunk size of 500 characters and an overlap of 100. This is ideal for semantic retrieval as it is context-aware. It tries to chunk text along natural semantic boundaries in a specific order: by paragraphs (n\n) first, then by sentences (.), and then by words. By keeping related sentences together in a single chunk, it keeps the original meaning and context intact, which is crucial for the embedding model to produce accurate vector representations.
+
+
+
+
+Q3: What embedding model did you use? Why did you choose it? How does it capture the meaning of the text?
+The final embedding model used is sentence-transformers/LaBSE. It was used in place of the default model for its superior ability in capturing deep semantic and cross-lingual context. LaBSE is particularly trained on a large parallel corpus and thus is especially great at producing vectors where comparable sentences, even of other languages (like English and Bengali), are located very near to one another in the vector space. It embodies meaning by conveying the contextual word relationships of a sentence into a concise numerical vector.
+
+
+Q4: How are you comparing the query with your stored chunks? Why did you choose this similarity method and storage setup?
+It uses a strong hybrid approach called the EnsembleRetriever. It's a method that takes two distinct search strategies:
+1. Semantic Search: Uses the FAISS vector store to perform a vector embedding-based similarity search (Cosine Similarity). This is excellent for capturing intent and meaning of a query.
+2. Keyword Search: Employs BM25Retriever, which is a classic information retrieval approach. It excels in retrieving documents with the exact keywords of the query. 
+This combination approach is much more robust than using each method individually. It ensures that if semantic search fails to capture the meaning of a query, the keyword search can still pick up useful pieces, and so on. 
+
+
+This combination provides one with the worst and best of both worlds and played a key role in solving the retrieval failures.
+
+
+Q5: How do you ensure that the question and the document chunks are compared meaningfully? What would happen if the query is vague or missing context?
+Semantic and meaning comparison are achieved through the EnsembleRetriever. The semantic part is aware of the "what you mean," while the keyword part is aware of the "what you say." It offers a double system that significantly increases the possibility of proper context retrieval.
+If the question were ambiguous or context-free (e.g., "And then what?"), it would likely fail. The retriever would bring back non-relevant documents because the query would not have specific semantic or keyword anchors. The final LLM, being faced with the non-relevant context, would correctly indicate that it cannot answer the question. A more advanced, chatty system would take care of this by using short-term memory, or conversation history wherein the imprecise query would be merged with the last turn of conversation to make a more precise, contextualized query for the retriever.
+
+
+Q6: Do the results seem relevant? If not, what might improve them?
+Yes, after the EnsembleRetriever has been put in place and a clean text file utilized, the output is now highly relevant and precise for the sample questions. The system can easily locate the accurate, nuance information required.
+However, for there to be continuous improvement, the following could be done:
+1. Fine-Tuning: The optimum performance could be obtained by fine-tuning the LaBSE embedding model on a tailor-made dataset of Bengali question-answer pairs from the text. This would teach the model the precise patterns of the knowledge base.
+2. Query Expansion: Before retrieval, an LLM can be used to paraphrase the user query into a series of more extended descriptive forms. This provides the retriever with more "shots on goal" on which to score the correct information.
+3. Integrate Conversational Memory: By integrating a chat history component, the system would be able to effectively handle follow-up questions and vague queries.
