@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-google-genai
+transformers
+torch
+sentence-transformers
+faiss-cpu
+pydantic
+rank_bm25
+fastapi
+uvicorn[standard]
+python-multipart
