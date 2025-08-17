@@ -1,0 +1,14 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+env/
+.env
+
+# Generated index files
+faiss_index_txt/
+
+# Colab-specific files
+.ipynb_checkpoints/
